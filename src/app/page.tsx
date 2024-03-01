@@ -1,9 +1,11 @@
 "use client";
 
-import { unstable_noStore as noStore } from "next/cache";
-import { api } from "~/trpc/react";
+import Link from "next/link";
 
 export default function Home() {
-  noStore();
-  return <>1</>;
+  return (
+    <>
+      <Link href={"/agent"}>Go to Agent page</Link>
+    </>
+  );
 }

@@ -11,7 +11,7 @@ export const postRouter = createTRPCRouter({
     return data;
   }),
 
-  getSalesPeople: publicProcedure.query(async ({ ctx }) => {
+  getSalesPersons: publicProcedure.query(async ({ ctx }) => {
     const data = await ctx.db.query.salesperson.findMany();
 
     return data;
@@ -20,7 +20,7 @@ export const postRouter = createTRPCRouter({
   getSalepersonDetails: publicProcedure
     .input(
       z.object({
-        id: z.string(),
+        id: z.number(),
         from: z.string().optional(),
         to: z.string().optional(),
       }),
@@ -38,7 +38,7 @@ export const postRouter = createTRPCRouter({
         .select({
           totalRevenue: sql<number>`sum(cast(ext_price as float))`,
           totalSales: sql<number>`count(*)`,
-          averagePrice: sql<number>`avg(cast(ext_price as float))`
+          averagePrice: sql<number>`avg(cast(ext_price as float))`,
         })
         .from(sale)
         .where(
@@ -50,7 +50,7 @@ export const postRouter = createTRPCRouter({
                   `${input.to}`,
                 )
               : sql`true`,
-            eq(sale.saleperson, salespersonDetails.code),
+            eq(sale.salesperson, salespersonDetails.code),
           ),
         );
 
@@ -59,8 +59,11 @@ export const postRouter = createTRPCRouter({
         .from(sale)
         .orderBy(desc(sale.shipped_date))
         .limit(5)
-        .leftJoin(customer, eq(sale.bt_cust_id, customer.customer_id))
-        .where(sql`saleperson IN (${salespersonDetails.code?.toString()})`)
+        .leftJoin(
+          customer,
+          sql`cast(${sale.bt_cust_id} as integer) = ${customer.customer_id}`,
+        )
+        .where(sql`${sale.salesperson} IN (${salespersonDetails.code?.toString()})`)
         .groupBy(sale.id, customer.customer_id);
 
       const totalByYear = await ctx.db
@@ -78,12 +81,12 @@ export const postRouter = createTRPCRouter({
                   `${input.to}`,
                 )
               : sql`true`,
-            eq(sale.saleperson, salespersonDetails.code),
+            eq(sale.salesperson, salespersonDetails.code),
             sql`cast(${sale.shipped_date} as date) > date_trunc('year', current_date) - interval '11 year' + interval '1 year'`,
             sql`cast(${sale.shipped_date} as date) <= date_trunc('year', current_date)`,
           ),
         )
-        .groupBy(sale.shipped_date);
+        .groupBy(({ year }) => year);
 
       return {
         totalByYear,
