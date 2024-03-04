@@ -1,7 +1,14 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { boolean, integer, pgSchema, text, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  pgSchema,
+  pgTable,
+  text,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -10,37 +17,24 @@ import { boolean, integer, pgSchema, text, uuid } from "drizzle-orm/pg-core";
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
 
-export const schema = pgSchema("schema");
-// export const publicSchema = pgSchema("public");
+export const eclipseSchema = pgSchema("eclipse");
 
-export const customer = schema.table("customer", {
+export const customer = eclipseSchema.table("customer", {
   customer_id: integer("customer_id"),
   is_bill_to: boolean("is_bill_to"),
   name: text("name"),
 });
 
-export const salesperson = schema.table("saleperson", {
-  id: uuid("id").notNull().primaryKey(),
+export const salesperson = pgTable("salesperson", {
+  id: integer("id").notNull().primaryKey(),
   code: text("code").notNull(),
   name: text("name"),
 });
 
-export const sale = schema.table("sale", {
+export const sale = pgTable("sale", {
   id: uuid("id").notNull().primaryKey(),
-  bt_cust_id: integer("bt_cust_id"),
-  saleperson: text("saleperson").notNull(),
+  bt_cust_id: text("bt_cust_id"),
+  salesperson: text("salesperson").notNull(),
   shipped_date: text("shipped_date"),
   ext_price: text("ext_price"),
 });
-
-// export const customer = eclipse.table("customer", {
-//   customer_id: integer("customer_id"),
-//   is_bill_to: boolean("is_bill_to"),
-//   name: text("name"),
-// });
-
-// export const salesperson = publicSchema.table("salesperson", {
-//   id: integer("id").notNull().primaryKey(),
-//   code: text("code").notNull(),
-//   name: text("name"),
-// });

@@ -5,13 +5,7 @@ import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import { api } from "~/trpc/react";
 
 export default function SalespersonList() {
-  const {data} = api.postRouter.getSalesPeople.useQuery()
-
-  console.log(data)
-
-  const {data: customer} = api.postRouter.getCustomers.useQuery()
-
-  console.log(customer)
+  const { data } = api.postRouter.getSalesPersons.useQuery();
 
   return (
     <div className="mx-auto flex w-full flex-col gap-2 ">

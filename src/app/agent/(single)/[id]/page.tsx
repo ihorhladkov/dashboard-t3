@@ -23,7 +23,7 @@ export default function SinglePage({ params }: { params: { id: string } }) {
 
   const { data } = api.postRouter.getSalepersonDetails.useQuery(
     {
-      id: params.id,
+      id: +params.id,
       from: date?.from && format(new Date(date?.from), "y-MM-dd"),
       to: date?.to && format(new Date(date?.to), "y-MM-dd"),
     },
